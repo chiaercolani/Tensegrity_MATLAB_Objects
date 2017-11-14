@@ -126,9 +126,9 @@ classdef TensegrityStructure < handle
                 obj.F = F;
             end
             
-            obj.quadProgOptions = optimoptions('linprog','Algorithm',  'interior-point','Display','off');
-            
-            obj.quadProgOptions = optimoptions('quadprog','Algorithm',  'interior-point-convex','Display','off');
+%             obj.quadProgOptions = optimoptions('linprog','Algorithm',  'interior-point','Display','off');
+%             
+%             obj.quadProgOptions = optimoptions('quadprog','Algorithm',  'interior-point-convex','Display','off');
             obj.groundHeight = 0;
             %%%%%%%%%%%%%%%%%%%%Dynamics Variables%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %these are quick vector lists of bars and strings inserted into simstruct
@@ -209,7 +209,7 @@ classdef TensegrityStructure < handle
             fqp = V'*A_g(1:obj.ss,:)*obj.F(:);
             Aqp = -V;
             bqp = sparse(A_g(1:obj.ss,:)*obj.F(:) - minForceDensity);
-           w = quadprog(Hqp,fqp,Aqp,bqp,[],[],[],[],[],obj.quadProgOptions);
+           w = quadProgFast(Hqp,fqp,Aqp,bqp);
            q=A_g(1:obj.ss,:)*obj.F(:) + V*w;
             lengths = sum((obj.nodePoints(obj.simStruct.topNs,:) - obj.nodePoints(obj.simStruct.botNs,:)).^2,2).^0.5;
             setStringRestLengths(obj,q,lengths)
