@@ -1,3 +1,9 @@
+# SuperBallBetweenWalls
+
+This fork of the original MATLAB framework aims at creating a simulation environment that will interface with a Python Reinforcement Learning algorithm. The ultimate objective of the RL algorithm is to allow SuperBall to crawl out of a hole.
+
+Four walls were added around SuperBall and the force interaction between the walls and the robot was modeled in MATLAB.
+
 # Tensegrity_MATLAB_Objects (MATLAB Tensegrity Dynamics Modeling and Simulation Framework)
 
 This MATLAB framework allows modeling and simulation of tensegrity dynamics, or the dynamics of a network of bars and strings. The dynamics of each bar are modeled as 2 point masses, one at each end of the bar. Collisions with a rigid ground are supported, but inter-bar collisions are not. The goal of this framework is to increase simulation fidelity compared to other tensegrity simulators such as NTRT.
@@ -35,13 +41,13 @@ nodes = [-barSpacing     barLength*0.5  0;
 ```
 In order to move the tensegrity to a certain position or rotate it, simply move/rotate the nodal coordinates:
 ```MATLAB
-HH  = makehgtform('axisrotate',[1 1 0],0.3); % Rotate 
+HH  = makehgtform('axisrotate',[1 1 0],0.3); % Rotate
 nodes = (HH(1:3,1:3)*nodes')';
 nodes(:,3) = nodes(:,3) + 1*barLength; % Move above ground level
 ```
 Create simplified bar- and string-connectivity matrices, to tell the simulator how the nodes are connected with bars and strings. Each simplified connectivity matrix is 2-by-*n*, where *n* is the number of bars/strings. For example, this means nodes 1 and 7 are connected by a string.
 ```MATLAB
-bars = [1:2:11; 
+bars = [1:2:11;
         2:2:12];
 strings = [1  1   1  1  2  2  2  2  3  3  3  3  4  4  4  4  5  5  6  6  7  7  8  8;
            7  8  10 12  5  6 10 12  7  8  9 11  5  6  9 11 11 12  9 10 11 12  9 10];
@@ -131,9 +137,9 @@ Alex Popescu
 
 This MATLAB framework allows modeling, visualization and simulation of tensegrity systems; networks of bars and strings. The dynamics of each bar are modeled as 2 point masses, one at each end of the bar. All string and bar far forces are modeled with linear stiffness and nodes as frictionless spherical joints.
 
-Collisions with a rigid ground are supported, but collision interactions between bar-bar bar-cable and cable-cable are currently not supported. 
+Collisions with a rigid ground are supported, but collision interactions between bar-bar bar-cable and cable-cable are currently not supported.
 
-This simulation provides a straightforward way to quickly assemble tensegrity structures with a simple underlying code that is easily modified to suit the users needs. 
+This simulation provides a straightforward way to quickly assemble tensegrity structures with a simple underlying code that is easily modified to suit the users needs.
 
 #####License############
 
