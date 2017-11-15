@@ -81,7 +81,12 @@ classdef TensegrityPlot < handle
             obj.sphereTForm = gobjects(obj.n,1);
             hold(ax,'on');
             for i = 1:obj.n
-                sphereHandle = surf(ax,xx,yy,zz,'LineStyle', 'none');
+                %even endcaps are red, odd endcaps are cyan
+                if mod(i,2)==0
+                    sphereHandle = surf(ax,xx,yy,zz,'LineStyle', 'none','FaceColor','r');
+                else
+                    sphereHandle = surf(ax,xx,yy,zz,'LineStyle', 'none','FaceColor','c');
+                end
                 obj.sphereTForm(i) = hgtransform('Parent',ax);
                 set(sphereHandle,'Parent',obj.sphereTForm(i))
                 set(obj.sphereTForm(i),'matrix',makehgtform('translate',obj.nodePoints(i,:)));
@@ -90,8 +95,10 @@ classdef TensegrityPlot < handle
             r = ones(2,1)*obj.barRad;
             [xx,yy,zz] = cylinder(r,cylRes);
             barTForm = gobjects(obj.bb,1);
+            % barColor =[ green;blue;yellow;magenta;cyan;black]
+            barColor=[ 0 1 0; 0 0 1; 1 1 0; 1 0 1; 0 1 1; 0 0 0];
             for i = 1:obj.bb
-                barHandle = surf(ax,xx,yy,zz,'LineStyle', 'none');
+                barHandle = surf(ax,xx,yy,zz,'LineStyle', 'none','FaceColor',barColor(i,:));
                 barTForm(i) = hgtransform('Parent',ax);
                 set(barHandle,'Parent',barTForm(i))
             end
