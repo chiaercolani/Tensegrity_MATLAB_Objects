@@ -4,7 +4,7 @@ This fork of the original MATLAB framework aims at creating a simulation environ
 
 Four walls were added around SuperBall and the force interaction between the walls and the robot was modeled in MATLAB.
 
-##Guide for SuperBallBetweenWalls
+## Guide for SuperBallBetweenWalls
 
 By running the file example.m it is possible to start a simulation that places SuperBall between four walls and, after an inital delay, starts moving the strings randomly (random movement coded in myDynamicsExample.m).
 
