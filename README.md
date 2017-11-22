@@ -4,6 +4,12 @@ This fork of the original MATLAB framework aims at creating a simulation environ
 
 Four walls were added around SuperBall and the force interaction between the walls and the robot was modeled in MATLAB.
 
+##Guide for SuperBallBetweenWalls
+
+By running the file example.m it is possible to start a simulation that places SuperBall between four walls and, after an inital delay, starts moving the strings randomly (random movement coded in myDynamicsExample.m).
+
+The file RL_main.m starts a simulation where forward propagation for reinforcement learning is implemented. A two layer neural network coded in myPolicyGradient.m generates a probability distribution between three actions that each motor can take (spool in, spool out and not move). Based on this probability distribution, an action will be picked for each motor. After these actions are applied, the environment will be observed again and a reward will be provided if all endcaps are lifted from the ground. The backpropagation for this neural network is not yet implemented.
+
 # Tensegrity_MATLAB_Objects (MATLAB Tensegrity Dynamics Modeling and Simulation Framework)
 
 This MATLAB framework allows modeling and simulation of tensegrity dynamics, or the dynamics of a network of bars and strings. The dynamics of each bar are modeled as 2 point masses, one at each end of the bar. Collisions with a rigid ground are supported, but inter-bar collisions are not. The goal of this framework is to increase simulation fidelity compared to other tensegrity simulators such as NTRT.

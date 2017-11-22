@@ -51,6 +51,9 @@ classdef TensegrityStructure < handle
         baseStationPoints
         stringTensions
         
+        %variable used for reward scheme
+        rewardTouchingGnd
+        
     end
     
     methods
@@ -250,6 +253,15 @@ classdef TensegrityStructure < handle
             kk = 1000;
             kFP = 20000;
             kFD = 5000;
+            
+             %friction model constants WALL
+            KpW = 30000;
+            KdW = 5000;
+            muSW = 0.64;
+            muDW = 0.54;
+            kkW = 1000;
+            kFPW = 30000;
+            kFDW = 5000;
 
             sim = obj.simStruct;
             groundH = obj.groundHeight;
@@ -338,6 +350,7 @@ classdef TensegrityStructure < handle
                 
                 %update points not in contact with the ground
                 notTouchingGround = (nodeXYZ(:,3) - groundH)>0;
+                obj.rewardTouchingGnd=~notTouchingGround;
                 %Update points not in contact with the wall
                 %Wall 1 and 2 are on the zy plane
                 %Wall 3 and 4 are on the zx plane
@@ -356,11 +369,11 @@ classdef TensegrityStructure < handle
                 
                 %Compute normal forces for the wall
                 % Separate computation for stuff on YZ and XZ planes
-                normForcesWallYZ=(obj.wall1-nodeXYZ(:,1)).*(Kp - Kd*nodeXYZdot(:,1));
-                normForcesWallYZ(touchingWall2)=(obj.wall2-nodeXYZ(touchingWall2,1)).*(Kp - Kd*nodeXYZdot(touchingWall2,1));
+                normForcesWallYZ=(obj.wall1-nodeXYZ(:,1)).*(KpW - KdW*nodeXYZdot(:,1));
+                normForcesWallYZ(touchingWall2)=(obj.wall2-nodeXYZ(touchingWall2,1)).*(KpW - KdW*nodeXYZdot(touchingWall2,1));
                 normForcesWallYZ(notTouchingWallYZ)=0;
-                normForcesWallXZ=(obj.wall3-nodeXYZ(:,2)).*(Kp - Kd*nodeXYZdot(:,2));
-                normForcesWallXZ(touchingWall4)=(obj.wall4-nodeXYZ(touchingWall4,2)).*(Kp - Kd*nodeXYZdot(touchingWall4,2));
+                normForcesWallXZ=(obj.wall3-nodeXYZ(:,2)).*(KpW - KdW*nodeXYZdot(:,2));
+                normForcesWallXZ(touchingWall4)=(obj.wall4-nodeXYZ(touchingWall4,2)).*(KpW - KdW*nodeXYZdot(touchingWall4,2));
                 normForcesWallXZ(notTouchingWallXZ)=0;
                 %Get velocity for the three planes (xy,yz and xz)
                 % Velocity on the xy plane will be used for ground forces
@@ -388,13 +401,13 @@ classdef TensegrityStructure < handle
                 staticF(staticNotApplied,:) = 0;
                 
                 %Possible static friction against the YZ walls
-                staticFYZ= kFP*(lastContactWallYZ - nodeXYZ(:,2:3)) - kFD*yzDot;
-                staticNotAppliedWallYZ= (sum((staticFYZ).^2,2) > (muS*normForcesWallYZ).^2)|notTouchingWallYZ;
+                staticFYZ= kFPW*(lastContactWallYZ - nodeXYZ(:,2:3)) - kFDW*yzDot;
+                staticNotAppliedWallYZ= (sum((staticFYZ).^2,2) > (muSW*normForcesWallYZ).^2)|notTouchingWallYZ;
                 staticFYZ(staticNotAppliedWallYZ,:)=0;
                 
                 %Possible static friction against the XZ walls
-                staticFXZ= kFP*(lastContactWallXZ - nodeXYZ(:,[1 3])) - kFD*xzDot;
-                staticNotAppliedWallXZ= (sum((staticFXZ).^2,2) > (muS*normForcesWallXZ).^2)|notTouchingWallXZ;
+                staticFXZ= kFPW*(lastContactWallXZ - nodeXYZ(:,[1 3])) - kFDW*xzDot;
+                staticNotAppliedWallXZ= (sum((staticFXZ).^2,2) > (muSW*normForcesWallXZ).^2)|notTouchingWallXZ;
                 staticFXZ(staticNotAppliedWallXZ,:)=0;
                 
                 
@@ -409,9 +422,9 @@ classdef TensegrityStructure < handle
                 
                 %Dynamic force computation for YZ walls
                 yzDotMag = sqrt(sum((yzDot).^2,2));
-                wYZ = (1 - exp(-kk*yzDotMag))./yzDotMag;
-                wYZ(yzDotMag<1e-9) = kk;
-                dynamicFmagYZ =  - muD * normForcesWallYZ .*wYZ ;
+                wYZ = (1 - exp(-kkW*yzDotMag))./yzDotMag;
+                wYZ(yzDotMag<1e-9) = kkW;
+                dynamicFmagYZ =  - muDW * normForcesWallYZ .*wYZ ;
                 dynamicFYZ = dynamicFmagYZ(:,[1 1]).* yzDot;
                 dynamicFYZ(~staticNotAppliedWallYZ,:) = 0;
                 %Tangent forces for ground contact
@@ -419,9 +432,9 @@ classdef TensegrityStructure < handle
                 
                 %Dynamic force computation for XZ walls
                 xzDotMag = sqrt(sum((xzDot).^2,2));
-                wXZ = (1 - exp(-kk*xzDotMag))./xzDotMag;
-                wXZ(xzDotMag<1e-9) = kk;
-                dynamicFmagXZ =  - muD * normForcesWallXZ .*wXZ ;
+                wXZ = (1 - exp(-kkW*xzDotMag))./xzDotMag;
+                wXZ(xzDotMag<1e-9) = kkW;
+                dynamicFmagXZ =  - muDW * normForcesWallXZ .*wXZ ;
                 dynamicFXZ = dynamicFmagXZ(:,[1 1]).* xzDot;
                 dynamicFXZ(~staticNotAppliedWallXZ,:) = 0;
                 %Tangent forces for ground contact

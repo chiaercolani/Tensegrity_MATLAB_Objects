@@ -12,9 +12,14 @@ classdef TensegrityPlot < handle
         stringRad             %string radius for plotting
         sphereTForm           %transform object for spheres which sit at nodes in plot
         memberTForms              %transform object for bar cylinders
+        plotErrorFlag           %Signals that an error occurred in the configuration of superBall. Used to quit epoch.
     end
     methods
         function obj = TensegrityPlot(nodePoints, stringNodes, barNodes, barRad, stringRad)
+            
+            %Initialize error flag
+            obj.plotErrorFlag=0;
+            
             if(size(nodePoints,2)~=3 || ~isnumeric(nodePoints))
                 error('node points should be n by 3 matrix of doubles')
             end
@@ -121,15 +126,24 @@ classdef TensegrityPlot < handle
             for i =1:nn
                 HH{i} = [eye(3), obj.nodePoints(i,:)'; 0 0 0 1] ;
             end
-           [obj.sphereTForm(:).Matrix] = HH{:};
-            if(isempty(obj.barNodes))
-                nodeXYZ1 = obj.nodePoints( obj.stringNodes(1,:),:);
-                nodeXYZ2 = obj.nodePoints( obj.stringNodes(2,:),:);
-            else
-                nodeXYZ1 = obj.nodePoints([obj.barNodes(1,:), obj.stringNodes(1,:)],:);
-                nodeXYZ2 = obj.nodePoints([obj.barNodes(2,:), obj.stringNodes(2,:)],:);
+            %Sometimes this update throws an error.
+            %Reset error flag
+            obj.plotErrorFlag=0;
+            try
+                [obj.sphereTForm(:).Matrix] = HH{:};
+                if(isempty(obj.barNodes))
+                    nodeXYZ1 = obj.nodePoints( obj.stringNodes(1,:),:);
+                    nodeXYZ2 = obj.nodePoints( obj.stringNodes(2,:),:);
+                else
+                    nodeXYZ1 = obj.nodePoints([obj.barNodes(1,:), obj.stringNodes(1,:)],:);
+                    nodeXYZ2 = obj.nodePoints([obj.barNodes(2,:), obj.stringNodes(2,:)],:);
+                end
+                updateMember(nodeXYZ1,nodeXYZ2,obj.memberTForms);
+            catch
+                disp('ERROR');
+                obj.plotErrorFlag=1;
+                %find a way to reset environment and not count the episode
             end
-            updateMember(nodeXYZ1,nodeXYZ2,obj.memberTForms);
         end
         
     end

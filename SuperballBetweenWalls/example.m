@@ -49,10 +49,10 @@ delT = 0.001;
 
      
 % Wall 1 and 4 are positive values
-wall1=0.9;
-wall2=-0.9;
-wall3=-0.9;
-wall4=0.9;
+wall1=0.8;
+wall2=-0.8;
+wall3=-0.8;
+wall4=0.8;
 
 superBall = TensegrityStructure(nodes, strings, bars, zeros(12,3), stringStiffness,...
     barStiffness, stringDamping, nodalMass, delT, delT, stringRestLength,wall1,wall2,wall3,wall4);
@@ -118,10 +118,11 @@ set(wall,'FaceColor',[0 0 1],'FaceAlpha',0.5);
 
 xlabel('x'); ylabel('y'); zlabel('z');
 
+
 %% Run dynamics
 displayTimespan = 0.05; % 20fps. Increase display time interval if system can't keep up.
-myDynamicsUpdate(superBall, superBallDynamicsPlot, displayTimespan);
+myDynamicsExample(superBall, superBallDynamicsPlot, displayTimespan);
 
 while(1)
-    myDynamicsUpdate();
+    myDynamicsExample();
 end
